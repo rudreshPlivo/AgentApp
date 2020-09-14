@@ -1,5 +1,5 @@
-const authId = `MAYTC2NDEXMTHJYJGZNW`; //replace auth Id
-const authToken = `NTkxNDQ0NDM5NWRhZTg3MmVhZjhjNmU1MjQwZWNj`; //replace auth token
+const authId = process.env.PLIVO_AUTH_ID; //replace auth Id
+const authToken = process.env.PLIVO_AUTH_TOKEN; //replace auth token
 const defaultPassword = `touch2success`; //default password for sip url
 const defaultAppId = `11171595981063813`; // default appliation attached to sip url https://console.plivo.com/voice/applications/
 
