@@ -27,8 +27,8 @@ class Team {
     };
     try {
       let newTeam = await axios.post(url, data, config);
-      console.log(newTeam.data);
-      console.log(`Team Id - ${newTeam.data.data.id}`);
+      console.info(newTeam.data);
+      console.info(`Team Id - ${newTeam.data.data.id}`);
       this.id = newTeam.data.data.id;
     } catch (error) {
       console.error(`error in creating the team - ${error}`);
@@ -49,18 +49,18 @@ class Team {
     let config = {
       baseURL: `https://datastore.plivo.com/`,
     };
-    console.log(`Team - ${this.name} Id ${this.id}`);
+    console.info(`Team - ${this.name} Id ${this.id}`);
     let url = `v1/teams/${this.id}/agents`;
     let data = {
       agents: this.agentIds,
     };
-    console.log(
+    console.info(
       `count of agents created for team ${this.name} - ${data.agents.length}`
     );
     try {
       await axios.post(url, data, config);
     } catch (error) {
-      console.log(`error in plivo adding agent to team ${error}`);
+      console.info(`error in plivo adding agent to team ${error}`);
     }
   }
 
@@ -83,13 +83,14 @@ class Team {
 
   //add agents to
   async addAgentstoTeam() {
-    for (let element of this.agentNames) {
+    for await (let element of this.agentNames) {
       element = JSON.parse(element);
       //check if agent already exists. if does then just map to Team
       //Using map to keep track of which agents have already been created already for a different team.
-      //Hence agentMap is static - key is agentnam as in csv file and value is agent instance object
-      let agentInstance = null;
-      if ((agentInstance = Team.agentMap.get(element.name))) {
+      //Hence agentMap is static - key is agentname as in csv file and value is agent instance object
+      let agentInstance = Team.agentMap.get(element.name);
+      console.info(`checking if agent is in map - ${element.name}`);
+      if (agentInstance) {
         //agent exists map to Team.
         try {
           this.addAgent(agentInstance); //only adds agentId in array "agentIds"
@@ -97,7 +98,7 @@ class Team {
           console.error(`error in adding agentID to team array ${error}`);
         }
       } else {
-        //agent doesnt exist. create agent
+        //agent doesnt exist. create agent. This may result in creation of duplicate agents
         //first create endpoint
         let agentEndpoint = new Endpoint(
           element.name,
@@ -125,6 +126,7 @@ class Team {
         }
         //then map agent to Team and add it to agentMap so that we dont create agent twice
         try {
+          console.info(`adding agent to map - ${element.name}`);
           Team.agentMap.set(element.name, thisAgent);
           this.addAgent(thisAgent);
         } catch (error) {
@@ -132,9 +134,9 @@ class Team {
         }
       }
     }
-    //Once all agentIds are populated in AgentId array, you can map agentstoteam.
-    console.log(`this will execute once for each team...${this.name}`);
-    this.mapAgentsToTeam();
+    //Once all agentIds are populated in AgentId array, you can map agents to team.
+    console.info(`this will execute once for each team...${this.name}`);
+    await this.mapAgentsToTeam();
   }
 }
 

@@ -12,15 +12,11 @@ axios.defaults.headers.post["Content-Type"] = "application/json";
 let teamArray = [
   {
     name: `BigFoodieChinese`,
-    csv: `BigfoodieChinese.csv`,
+    csv: `BigFoodieChinese.csv`,
   },
   {
     name: `BigFoodieEnglish`,
     csv: `BigFoodieEnglish.csv`,
-  },
-  {
-    name: `BigQueue`,
-    csv: `BigQueue.csv`,
   },
   {
     name: `Sales`,
@@ -30,15 +26,33 @@ let teamArray = [
     name: `VipQueue`,
     csv: `Vipclients.csv`,
   },
+  {
+    name: `BigQueue`,
+    csv: `BigQueue.csv`,
+  },
 ];
+
+//team array
+let createdTeamArray = [];
 
 //create Teams
 (async function () {
   for (let team of teamArray) {
     let newTeam = new Team(team.name, team.csv);
     await newTeam.createTeam();
-    await newTeam.createAgentsForTeam();
+    createdTeamArray.push(newTeam);
     console.log(`newTeam - ${newTeam.name}`);
+  }
+
+  for (let team of createdTeamArray) {
+    await team.createAgentsForTeam();
+    syncWait(5000);
+    console.log(`agents created for team - ${team.name}`);
+  }
+
+  function syncWait(ms) {
+    let end = Date.now() + ms;
+    while (Date.now() < end) continue;
   }
 
   /*
